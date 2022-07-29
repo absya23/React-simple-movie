@@ -1,30 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MovieCard from "./MovieCard";
 import { SwiperSlide, Swiper } from "swiper/react";
 import useSWR from "swr";
-import { fetcher } from "../../config/config";
-
-//https://api.themoviedb.org/3/movie/now_playing?api_key=00378cddb9a419427e807c3421af6a19&language=en-US&page=1
+import { fetcher, tmdbAPI } from "apiConfig/config";
 
 const MovieList = ({ type = "now_playing" }) => {
-  const [movies, setMovies] = useState([]);
-  const { data, error } = useSWR(
-    `https://api.themoviedb.org/3/movie/${type}?api_key=00378cddb9a419427e807c3421af6a19`,
-    fetcher
-  );
-  useEffect(() => {
-    // if(error) ;
-    if (data && data.results) setMovies(data.results);
-  }, [data]);
-  // console.log(movies);
+  const { data } = useSWR(tmdbAPI.getMovieList(type), fetcher);
+  const movies = data?.results || [];
+
   return (
     <div className="movie-list">
       <Swiper grabCursor={true} spaceBetween={40} slidesPerView={"auto"}>
         {movies &&
           movies.length > 0 &&
           movies.map((item) => (
-            <SwiperSlide>
-              <MovieCard item={item} key={item.id}></MovieCard>
+            <SwiperSlide key={item.id}>
+              <MovieCard item={item}></MovieCard>
             </SwiperSlide>
           ))}
       </Swiper>
